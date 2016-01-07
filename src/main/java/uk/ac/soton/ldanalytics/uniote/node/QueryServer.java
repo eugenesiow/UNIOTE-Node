@@ -12,7 +12,6 @@ import org.zeromq.ZMQ;
 
 import uk.ac.soton.ldanalytics.sparql2sql.model.RdfTableMapping;
 import uk.ac.soton.ldanalytics.sparql2sql.model.SparqlOpVisitor;
-import uk.ac.soton.ldanalytics.sparql2sql.util.SQLFormatter;
 import uk.ac.soton.ldanalytics.sparql2stream.parser.StreamQueryFactory;
 
 
@@ -20,6 +19,8 @@ public class QueryServer {
 
 	public static void main(String[] args) {
 		ZMQ.Context context = ZMQ.context(1);
+		
+		QueryTable queries = new QueryTable();
 
         ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
         subscriber.connect("tcp://localhost:5600");
@@ -32,7 +33,7 @@ public class QueryServer {
 		Map<String,String> streamCatalog = new HashMap<String,String>();
 		streamCatalog.put("_HP001", "http://www.cwi.nl/SRBench/observations");
 		
-		final NodeCepEngine engine = new NodeCepEngine("cep_engine");
+		final NodeCepEngine engine = new NodeCepEngine("cep_engine",queries);
 		engine.AddStream("_HP001", "/Users/eugene/Documents/workspace/sparql2stream/format/_HP001.format");
 		
 		Executors.newSingleThreadExecutor().execute(new Runnable() {
@@ -40,7 +41,6 @@ public class QueryServer {
 		    	engine.PlayFromCSV("_HP001", "/Users/eugene/Documents/workspace/sparql2stream/samples/_HP001.csv", true, 0, "yyyy-MM-dd hh:mm:ss");
 		    }
 		});
-		
 
         //  wait for messages
         while (!Thread.currentThread ().isInterrupted ()) {        	
@@ -48,7 +48,7 @@ public class QueryServer {
             String qid = subscriber.recvStr();
             String add = subscriber.recvStr();
             String queryStr = subscriber.recvStr();
-            long queryHash = queryStr.hashCode();
+            String queryHash = Long.toString(queryStr.hashCode());
 //            System.out.println(qid + ":" + add + ":" + queryStr + ":" + queryHash);
             
             Query query = StreamQueryFactory.create(queryStr);
@@ -64,9 +64,11 @@ public class QueryServer {
 //    		SQLFormatter formatter = new SQLFormatter();
 //    		System.out.println(formatter.format(v.getSQL()));
     		
-    		engine.AddQuery(v.getSQL());
-
+    		queries.add(queryHash, add, qid);
+    		engine.AddQuery(v.getSQL(),queryHash);
         }
+        
+        engine.shutdown();
 
         subscriber.close();
         context.term();

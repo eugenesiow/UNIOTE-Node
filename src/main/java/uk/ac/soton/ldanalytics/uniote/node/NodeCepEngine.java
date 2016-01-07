@@ -1,18 +1,28 @@
 package uk.ac.soton.ldanalytics.uniote.node;
 
+import org.zeromq.ZMQ;
+
 import uk.ac.soton.ldanalytics.sparql2stream.cep.CepEngine;
 
 import com.espertech.esper.client.EPStatement;
 
 public class NodeCepEngine extends CepEngine {
+	
+	private QueryTable queries = null;
+	private ZMQ.Context context;
 
-	public NodeCepEngine(String providerName) {
+	public NodeCepEngine(String providerName, QueryTable queries) {
 		super(providerName);
+		context = ZMQ.context(2);
+		this.queries = queries;
 	}
 	
-	public void AddQuery(String queryStr) {
+	public void AddQuery(String queryStr,String queryHash) {
 		EPStatement statement = epService.getEPAdministrator().createEPL(queryStr);
-		String queryHash = Long.toString(queryStr.hashCode());
-        statement.addListener(new NodeQueryListener(queryHash));
+        statement.addListener(new NodeQueryListener(queryHash,queries,context));
+	}
+	
+	public void shutdown() {
+		context.term();
 	}
 }
