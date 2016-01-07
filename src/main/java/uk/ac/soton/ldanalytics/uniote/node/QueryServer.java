@@ -2,6 +2,7 @@ package uk.ac.soton.ldanalytics.uniote.node;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.algebra.Algebra;
@@ -13,6 +14,7 @@ import uk.ac.soton.ldanalytics.sparql2sql.model.RdfTableMapping;
 import uk.ac.soton.ldanalytics.sparql2sql.model.SparqlOpVisitor;
 import uk.ac.soton.ldanalytics.sparql2sql.util.SQLFormatter;
 import uk.ac.soton.ldanalytics.sparql2stream.parser.StreamQueryFactory;
+
 
 public class QueryServer {
 
@@ -29,10 +31,19 @@ public class QueryServer {
     	mapping.loadMapping("/Users/eugene/Downloads/knoesis_observations_ike_map_meta/HP001.nt");
 		Map<String,String> streamCatalog = new HashMap<String,String>();
 		streamCatalog.put("_HP001", "http://www.cwi.nl/SRBench/observations");
+		
+		final NodeCepEngine engine = new NodeCepEngine("cep_engine");
+		engine.AddStream("_HP001", "/Users/eugene/Documents/workspace/sparql2stream/format/_HP001.format");
+		
+		Executors.newSingleThreadExecutor().execute(new Runnable() {
+		    public void run() {
+		    	engine.PlayFromCSV("_HP001", "/Users/eugene/Documents/workspace/sparql2stream/samples/_HP001.csv", true, 0, "yyyy-MM-dd hh:mm:ss");
+		    }
+		});
+		
 
         //  wait for messages
         while (!Thread.currentThread ().isInterrupted ()) {        	
-            //  Use trim to remove the tailing '0' character
             String sub = subscriber.recvStr();
             String qid = subscriber.recvStr();
             String add = subscriber.recvStr();
@@ -49,9 +60,12 @@ public class QueryServer {
     		v.setNamedGraphs(query.getNamedGraphURIs());
     		v.setStreamCatalog(streamCatalog);
     		OpWalker.walk(op,v);
-    		SQLFormatter formatter = new SQLFormatter();
     		
-    		System.out.println(formatter.format(v.getSQL()));
+//    		SQLFormatter formatter = new SQLFormatter();
+//    		System.out.println(formatter.format(v.getSQL()));
+    		
+    		engine.AddQuery(v.getSQL());
+
         }
 
         subscriber.close();
