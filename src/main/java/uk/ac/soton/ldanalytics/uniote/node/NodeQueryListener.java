@@ -53,6 +53,7 @@ public class NodeQueryListener implements UpdateListener {
 				for(Entry<String,String> addresses:addList.entrySet()) {
 					ZMQ.Socket sender = context.socket(ZMQ.PUSH);
 					sender.connect("tcp://"+addresses.getKey()+":5700");
+
 					
 //					sender.sendMore(queryName);
 					sender.sendMore(addresses.getValue());
