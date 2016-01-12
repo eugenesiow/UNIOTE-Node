@@ -1,9 +1,12 @@
 package uk.ac.soton.ldanalytics.uniote.node;
 
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 
 import org.apache.jena.query.Query;
@@ -27,12 +30,25 @@ public class QueryServer {
 		
 		QueryTable queries = new QueryTable();
 		
+		String configFile = "config.json";
+		
+		Properties prop = new Properties();
+		
 		try {
+			// load a properties file
+			prop.load(new FileInputStream("config.properties"));
+			String[] brokers = prop.getProperty("subscribe_brokers").split(";");
+			
 	        ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
-	        subscriber.connect("tcp://localhost:5600");
+	        for(String broker:brokers) {
+	        	subscriber.connect(broker);
+	        }
+	        
+	        if(args.length>=1)
+	        	configFile = args[0];
 			
 			Gson g = new Gson();
-			JsonReader reader = new JsonReader(new FileReader("_HP001.json"));
+			JsonReader reader = new JsonReader(new FileReader(configFile));
 			final StreamConfig config = g.fromJson(reader, StreamConfig.class);
 			reader.close();
 			
@@ -46,9 +62,7 @@ public class QueryServer {
 			
 			final NodeCepEngine engine = new NodeCepEngine("cep_engine",queries);
 			engine.AddStream(config.getName(), config.getFormat());
-			
-			
-			
+
 			Executors.newSingleThreadExecutor().execute(new Runnable() {
 			    public void run() {
 			    	StreamReplayConfig replay = config.getReplay();

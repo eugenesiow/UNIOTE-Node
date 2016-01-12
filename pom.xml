@@ -24,7 +24,18 @@
 		<artifactId>gson</artifactId>
 		<version>2.4</version>
 	</dependency>
+	<dependency>
+        <groupId>uk.ac.soton.ldanalytics</groupId>
+        <artifactId>sparql2sql</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+     </dependency>
+     <dependency>
+        <groupId>uk.ac.soton.ldanalytics</groupId>
+        <artifactId>sparql2stream</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+     </dependency>
   </dependencies>
+  
   
 	<build>
 	<plugins>
@@ -38,11 +49,50 @@
 	          <manifest>
 	            <addClasspath>true</addClasspath>
 	            <classpathPrefix>dependency/</classpathPrefix>
-	            <mainClass>uk.ac.soton.ldanalytics.uniote.node</mainClass>
+	            <mainClass>uk.ac.soton.ldanalytics.uniote.node.QueryServer</mainClass>
 	          </manifest>
 	        </archive>
 	      </configuration>
 	    </plugin>
+	    <plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-install-plugin</artifactId>
+		  <executions>
+		    <execution>
+		      <id>install-external</id>
+		      <phase>clean</phase>
+		      <configuration>
+		        <file>/Users/eugene/Documents/workspace/sparql2stream/target/sparql2stream-0.0.1-SNAPSHOT.jar</file>
+		        <repositoryLayout>default</repositoryLayout>
+		        <groupId>uk.ac.soton.ldanalytics</groupId>
+		        <artifactId>sparql2stream</artifactId>
+		        <version>0.0.1-SNAPSHOT</version>
+		        <packaging>jar</packaging>
+		        <generatePom>true</generatePom>
+		      </configuration>
+		      <goals>
+		        <goal>install-file</goal>
+		      </goals>
+		    </execution>
+		    <execution>
+		      <id>install-external2</id>
+		      <phase>clean</phase>
+		      <configuration>
+		        <file>/Users/eugene/Documents/workspace/sparql2sql/target/sparql2sql-0.0.1-SNAPSHOT.jar</file>
+		        <repositoryLayout>default</repositoryLayout>
+		        <groupId>uk.ac.soton.ldanalytics</groupId>
+		        <artifactId>sparql2sql</artifactId>
+		        <version>0.0.1-SNAPSHOT</version>
+		        <packaging>jar</packaging>
+		        <generatePom>true</generatePom>
+		      </configuration>
+		      <goals>
+		        <goal>install-file</goal>
+		      </goals>
+		    </execution>
+		  </executions>
+		</plugin>
 	  </plugins>
+	  
 	</build>
 </project>
