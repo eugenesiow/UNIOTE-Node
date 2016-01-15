@@ -1,0 +1,13 @@
+{
+	"name":"_AP189",
+	"uri":"http://www.cwi.nl/SRBench/observations",
+	"mapping_src":"/Users/eugene/Downloads/knoesis_observations_ike_map_meta/AP189.nt",
+	"format_src":"/Users/eugene/Downloads/knoesis_observations_ike_format/_AP189.format",
+	"replay":{
+		"src":"/Users/eugene/Downloads/knoesis_observations_ike_csv/_AP189.csv",
+		"time_col":0,
+		"header":true,
+		"time_format":"yyyy-MM-dd'T'hh:mm:ss",
+		"fixed_delay":1000
+	}
+}

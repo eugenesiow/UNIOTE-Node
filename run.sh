@@ -1,0 +1,1 @@
+java -jar uniote_node-0.0.1-SNAPSHOT.jar _HP001.json

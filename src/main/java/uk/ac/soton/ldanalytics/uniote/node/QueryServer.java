@@ -3,7 +3,6 @@ package uk.ac.soton.ldanalytics.uniote.node;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -66,7 +65,7 @@ public class QueryServer {
 			Executors.newSingleThreadExecutor().execute(new Runnable() {
 			    public void run() {
 			    	StreamReplayConfig replay = config.getReplay();
-			    	engine.PlayFromCSV(config.getName(), replay.getSource(), replay.hasHeader(), replay.getTimeCol(), replay.getTimeFormat());
+			    	engine.PlayFromCSV(config.getName(), replay.getSource(), replay.hasHeader(), replay.getTimeCol(), replay.getTimeFormat(), replay.getFixedDelay());
 			    }
 			});
 

@@ -1,0 +1,12 @@
+{
+	"name":"_AIRGL",
+	"uri":"http://www.cwi.nl/SRBench/observations",
+	"mapping_src":"/Users/eugene/Downloads/knoesis_observations_ike_map_meta/AIRGL.nt",
+	"format_src":"/Users/eugene/Documents/workspace/sparql2stream/format/_AIRGL.format",
+	"replay":{
+		"src":"/Users/eugene/Documents/workspace/sparql2stream/samples/_AIRGL.csv",
+		"time_col":0,
+		"header":true,
+		"time_format":"yyyy-MM-dd'T'hh:mm:ss"
+	}
+}
